@@ -20,9 +20,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t your-dockerhub-username/web-app:latest -t your-dockerhub-username/web-app:${{ github.sha }} .
+        run: docker build -t cosmin12300/firstapp:latest -t cosmin12300/web-app:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push your-dockerhub-username/web-app:latest
-          docker push your-dockerhub-username/web-app:${{ github.sha }}
+          docker push cosmin12300/firstapp:latest
+          docker push cosmin12300/firstapp:${{ github.sha }}
