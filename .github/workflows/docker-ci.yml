@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t cosmin12300/firstapp:latest -t cosmin12300/web-app:${{ github.sha }} .
+        run: docker build -t cosmin12300/firstapp:latest -t cosmin12300/firstapp:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
