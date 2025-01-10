@@ -1,128 +1,35 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        header {
-            background-color: #4CAF50;
-            color: white;
-            width: 100%;
-            padding: 15px 0;
-            text-align: center;
-        }
-
-        main {
-            width: 80%;
-            max-width: 1000px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        footer {
-            background-color: #4CAF50;
-            color: white;
-            width: 100%;
-            padding: 10px;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        input[type="text"], input[type="email"], textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .cta {
-            margin-top: 20px;
-        }
-
-        .cta a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-
-        .cta a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>PC Parts Company - Home</title>
+    
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
-
     <header>
-        <h1>Welcome to the HTML Demo</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="order.html">Order</a></li>
+            </ul>
+        </nav>
     </header>
-
+    <img src="images/logo.png" alt="PC Parts Company Logo">
     <main>
-        <section>
-            <h2>About This Page</h2>
-            <p>This is a simple demonstration of a basic HTML page. It includes a header, a main content area with a form, and a footer. The page is styled with CSS to give it a modern, clean look.</p>
-        </section>
-
-        <section>
-            <h2>Contact Us</h2>
-            <form action="#" method="post">
-                <label for="name">Your Name:</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="email">Your Email:</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="message">Your Message:</label>
-                <textarea id="message" name="message" rows="5" required></textarea>
-
-                <button type="submit">Send Message</button>
-            </form>
-        </section>
-
-        <section class="cta">
-            <p>Interested in more? <a href="#">Click here to learn more</a></p>
-        </section>
+        <h1>Welcome to Our PC Parts Company</h1>
+        <p>We offer high-quality parts for building or upgrading your PC.</p>
+        <p><a href="order.html">Place your order now!</a></p>
     </main>
-
+    
     <footer>
-        <p>&copy; 2025 HTML Demo Page</p>
+        <p>&copy; 2025 PC Parts Company</p>
     </footer>
 
+    <!-- Link to JavaScript file -->
+    <script src="js/script.js"></script>
 </body>
-
 </html>
-
