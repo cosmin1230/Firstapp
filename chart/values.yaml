@@ -1,0 +1,26 @@
+apiVersion: v1
+backend:
+  image: cosmin12300/backend:latest
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 8080
+frontend:
+  image: cosmin12300/frontend:latest
+  replicas: 1
+  service:
+    type: LoadBalancer
+    port: 80
+mysql:
+  image: mysql:5.5
+  service:
+    type: ClusterIP
+    port: 3306
+  persistence:
+    enabled: true
+    storage: 5Gi
+  secret:
+    name: mysql-secret
+    rootPasswordKey: MYSQL_ROOT_PASSWORD
+    userKey: MYSQL_USER
+    passwordKey: MYSQL_PASSWORD
