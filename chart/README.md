@@ -1,4 +1,3 @@
-# README.md contents
 # My Application Helm Chart
 
 This Helm chart packages a complete application consisting of a frontend, backend, and MySQL database, along with all necessary Kubernetes resources.
@@ -61,3 +60,4 @@ export MYSQL_USER=your-mysql-user
 export MYSQL_PASSWORD=your-mysql-password
 
 helm install myapp ./my-application
+```

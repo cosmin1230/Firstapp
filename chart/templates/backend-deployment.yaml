@@ -17,4 +17,3 @@ spec:
         image: {{ .Values.backend.image }}
         ports:
         - containerPort: 8080
-  

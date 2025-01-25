@@ -17,4 +17,3 @@ spec:
         image: {{ .Values.frontend.image }}
         ports:
         - containerPort: 80
-      
