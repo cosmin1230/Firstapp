@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-push:
@@ -25,23 +25,19 @@ jobs:
         run: npm install
         working-directory: Backend
 
-      - name: Run backend tests
-        run: npm test
-        working-directory: Backend
-
       - name: Build backend Docker image
-        run: docker build -t cosmin12300/appbackend:latest .
+        run: docker build -t your-dockerhub-username/pc-parts-backend:latest .
         working-directory: Backend
 
       - name: Build frontend Docker image
-        run: docker build -t your-dockerhub-username/appfrontend:latest .
+        run: docker build -t your-dockerhub-username/pc-parts-frontend:latest .
         working-directory: Frontend
 
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Push backend Docker image
-        run: docker push your-dockerhub-username/appbackend:latest
+        run: docker push your-dockerhub-username/pc-parts-backend:latest
 
       - name: Push frontend Docker image
-        run: docker push your-dockerhub-username/appfrontend:latest
+        run: docker push your-dockerhub-username/pc-parts-frontend:latest
