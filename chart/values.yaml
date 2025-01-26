@@ -24,3 +24,6 @@ mysql:
     rootPasswordKey: MYSQL_ROOT_PASSWORD
     userKey: MYSQL_USER
     passwordKey: MYSQL_PASSWORD
+    rootPassword: {{ required "MYSQL_ROOT_PASSWORD environment variable is required" (env "MYSQL_ROOT_PASSWORD") }}
+    user: {{ required "MYSQL_USER environment variable is required" (env "MYSQL_USER") }}
+    password: {{ required "MYSQL_PASSWORD environment variable is required" (env "MYSQL_PASSWORD") }}
