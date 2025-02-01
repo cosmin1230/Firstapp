@@ -137,5 +137,3 @@ dist
 
 # Ignore node_modules in Backend directory
 Backend/node_modules/
-
-chart/templates/mysql-secret.yaml
