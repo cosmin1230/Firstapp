@@ -24,12 +24,9 @@ spec:
         ports:
         - containerPort: 3306
           name: mysql
-          {{ if .Values.mysql.persistence.enabled }}
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
-          {{ end }}
-          {{ if .Values.mysql.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
       name: mysql-persistent-storage
@@ -38,4 +35,3 @@ spec:
       resources:
         requests:
           storage: {{ .Values.mysql.persistence.storage }}
-          {{ end }}
