@@ -16,7 +16,7 @@ frontend:
   replicas: 1
   service:
     type: LoadBalancer
-    resources:
+  resources:
       limits:
         cpu: 100m
         memory: 128Mi
