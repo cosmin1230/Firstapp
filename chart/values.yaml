@@ -32,5 +32,6 @@ mysql:
   persistence:
     enabled: true
     storage: 5Gi
+    storageClass: standard
   secret:
     rootPassword: password
