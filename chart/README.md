@@ -41,23 +41,3 @@ helm uninstall my-application
 ## License
 
 This project is licensed under the MIT License.
-
-## Environment Variables
-
-The following environment variables are required to deploy the chart:
-
-- `MYSQL_ROOT_PASSWORD`: The root password for MySQL.
-- `MYSQL_USER`: The MySQL user.
-- `MYSQL_PASSWORD`: The password for the MySQL user.
-
-## Installation
-
-To install the chart with the release name `myapp`:
-
-```sh
-export MYSQL_ROOT_PASSWORD=your-root-password
-export MYSQL_USER=your-mysql-user
-export MYSQL_PASSWORD=your-mysql-password
-
-helm install myapp ./my-application
-```

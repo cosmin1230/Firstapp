@@ -5,8 +5,8 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: backend
+    app: {{ include "my-application.name" . }}-backend
   ports:
   - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    port: 3000
+    targetPort: 3000

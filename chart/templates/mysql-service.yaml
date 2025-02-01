@@ -5,7 +5,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: mysql
+    app: {{ include "my-application.name" . }}-mysql
   ports:
   - protocol: TCP
     port: 3306

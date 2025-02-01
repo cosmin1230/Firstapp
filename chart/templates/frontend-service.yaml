@@ -5,7 +5,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: frontend
+    app: {{ include "my-application.name" . }}-frontend
   ports:
   - protocol: TCP
     port: 80

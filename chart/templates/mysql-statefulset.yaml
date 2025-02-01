@@ -6,7 +6,6 @@ spec:
   selector:
     matchLabels:
       app: {{ include "my-application.name" . }}-mysql
-  serviceName: "mysql"
   replicas: 1
   template:
     metadata:
@@ -20,24 +19,17 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.mysql.secret.name }}
-              key: {{ .Values.mysql.secret.rootPasswordKey }}
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.mysql.secret.name }}
-              key: {{ .Values.mysql.secret.userKey }}
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.mysql.secret.name }}
-              key: {{ .Values.mysql.secret.passwordKey }}
+              name: {{ include "my-application.name" . }}-mysql-secret
+              key: rootPassword
         ports:
         - containerPort: 3306
           name: mysql
+          {{ if .Values.mysql.persistence.enabled }}
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
+          {{ end }}
+          {{ if .Values.mysql.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
       name: mysql-persistent-storage
@@ -46,3 +38,4 @@ spec:
       resources:
         requests:
           storage: {{ .Values.mysql.persistence.storage }}
+          {{ end }}

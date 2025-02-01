@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Simulated user database
-const users = { admin: "1234" };
+const users = { admin: process.env.MYSQL_ROOT_PASSWORD };
 
 // Authentication status
 let authenticatedUser = null;

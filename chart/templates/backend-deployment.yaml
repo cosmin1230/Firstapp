@@ -16,4 +16,19 @@ spec:
       - name: backend
         image: {{ .Values.backend.image }}
         ports:
-        - containerPort: 8080
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: {{ .Values.backend.resources.limits.cpu }}
+            memory: {{ .Values.backend.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.backend.resources.requests.cpu }}
+            memory: {{ .Values.backend.resources.requests.memory }}
+            env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "my-application.name" . }}-mysql-secret
+              key: rootPassword
+        - name: MYSQL_URL
+          value: {{ include "my-application.name" . }}-mysql
