@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master
-
+    paths:
+      - 'Frontend/**'
+      
 jobs:
   build-and-push-frontend:
     runs-on: ubuntu-latest
