@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "my-application.name" . }}-frontend-deployment
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: {{ .Values.frontend.replicaCount }}
   selector:
