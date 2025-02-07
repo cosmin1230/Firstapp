@@ -1,8 +1,6 @@
 backend:
   image: cosmin12300/backend:latest
   replicas: 1
-  service:
-    type: ClusterIP
   resources:
     limits:
       cpu: 100m
@@ -14,8 +12,6 @@ backend:
 frontend:
   image: cosmin12300/frontend:latest
   replicas: 1
-  service:
-    type: LoadBalancer
   resources:
       limits:
         cpu: 100m

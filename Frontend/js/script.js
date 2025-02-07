@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Check authentication status
-    fetch("http://localhost:3000/auth", {  // Ensure the backend URL matches
+    fetch("http://backend.local:8080/auth", {  // Ensure the backend URL matches
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Login form submitted:", username, password);
 
             // Send login request to backend
-            fetch("http://localhost:3000/auth/login", {  // Ensure the backend URL matches
+            fetch("http://backend.local:8080/auth/login", {  // Ensure the backend URL matches
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutLink.addEventListener("click", () => {
             console.log("Logout clicked");
             // Send logout request to backend
-            fetch("http://localhost:3000/auth/logout", {  // Ensure the backend URL matches
+            fetch("http://backend.local:8080/auth/logout", {  // Ensure the backend URL matches
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             })
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Order form submitted:", { part, quantity });
 
             // Send order request to backend
-            fetch("http://localhost:3000/order/submit", {  // Ensure the backend URL matches
+            fetch("http://backend.local:8080/order/submit", {  // Ensure the backend URL matches
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ part, quantity }),
