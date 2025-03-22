@@ -56,12 +56,12 @@ ingress:
         - path: /
           pathType: Prefix
           service:
-            name: prometheus-stack-kube-prom-prometheus
+            name: prometheus-kube-prometheus-prometheus
             port: 9090
     - host: grafana.local
       paths:
         - path: /
           pathType: Prefix
           service:
-            name: prometheus-stack-grafana
+            name: prometheus-grafana
             port: 80
