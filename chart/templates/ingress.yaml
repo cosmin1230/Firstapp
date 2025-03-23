@@ -5,6 +5,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "my-application.name" $ }}-ingress-{{ .host | replace "." "-" }}
+  namespace: {{ .namespace | default $.Release.Namespace }}
   annotations:
     {{- range $key, $value := $.Values.ingress.annotations }}
     {{ $key }}: {{ $value | quote }}

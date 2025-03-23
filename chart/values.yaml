@@ -65,3 +65,11 @@ ingress:
           service:
             name: prometheus-grafana
             port: 80
+    - host: argocd.local
+      namespace: argocd
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: argocd-server
+            port: 80
