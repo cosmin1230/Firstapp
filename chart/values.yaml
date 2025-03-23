@@ -51,20 +51,6 @@ ingress:
           service:
             name: backend-service
             port: 3000
-    - host: prometheus.local
-      paths:
-        - path: /
-          pathType: Prefix
-          service:
-            name: prometheus-kube-prometheus-prometheus
-            port: 9090
-    - host: grafana.local
-      paths:
-        - path: /
-          pathType: Prefix
-          service:
-            name: prometheus-grafana
-            port: 80
     - host: argocd.local
       namespace: argocd
       paths:
