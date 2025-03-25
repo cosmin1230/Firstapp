@@ -1,3 +1,10 @@
 configs:
   params:
     server.insecure: true
+server:
+  ingress:
+    enabled: true
+    hosts:
+      - argocd.local
+    ingressClassName: nginx
+    tls: []

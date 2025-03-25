@@ -51,11 +51,3 @@ ingress:
           service:
             name: backend-service
             port: 3000
-    - host: argocd.local
-      namespace: argocd
-      paths:
-        - path: /
-          pathType: Prefix
-          service:
-            name: argocd-server
-            port: 80
