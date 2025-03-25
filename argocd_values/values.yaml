@@ -4,7 +4,6 @@ configs:
 server:
   ingress:
     enabled: true
-    hosts:
-      - argocd.local
+    hostname: argocd.local
     ingressClassName: nginx
     tls: []
