@@ -28,3 +28,19 @@ jobs:
         run: |
           docker push cosmin12300/backend:latest
           docker push cosmin12300/backend:${{ github.sha }}
+
+      - name: Update Helm values.yaml with new Docker tag
+        run: |
+          # Update the image tag in values.yaml
+          sed -i "s|cosmin12300/backend:.*|cosmin12300/backend:${{ github.sha }}|" chart/values.yaml
+          
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Commit and push changes
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git checkout master
+          git add chart/values.yaml
+          git commit -m "Update backend image tag to ${{ github.sha }} [skip ci]"
+          git push origin master
