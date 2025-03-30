@@ -17,6 +17,8 @@ spec:
       - values.yaml
       values: |
         controller:
+          replicaCount: 1
+          
           metrics:
             enabled: true  # Required for Prometheus scraping
           
