@@ -7,11 +7,14 @@ spec:
   project: default
   source:
     repoURL: https://github.com/prometheus-operator/kube-prometheus
-    targetRevision: main
+    targetRevision: 70.2.1
     path: manifests/setup
   destination:
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:
-      prune: false  # ← Important! Never auto-delete CRDs
+      prune: false  # Never auto-delete CRDs!
       selfHeal: true
+    syncOptions:
+    - Validate=false  # Skip validation for large CRDs
+    - ServerSideApply=true
