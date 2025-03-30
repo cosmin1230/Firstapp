@@ -23,7 +23,6 @@ spec:
             enabled: true  # Required for Prometheus scraping
           
           # Disable HTTPS features
-          extraArgs:
           containerPort:
             https: null
           service:
