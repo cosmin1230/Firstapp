@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp
+  namespace: argocd  # ArgoCD manages this app
+spec:
+  destination:
+    namespace: my-app  # Target namespace for your app
+    server: https://kubernetes.default.svc  # Cluster where it deploys
+  project: default
+  source:
+    helm:
+      valueFiles:
+      - values.yaml  # Helm values file (relative to `path`)
+    path: chart  # Path to Helm chart in the repo
+    repoURL: https://github.com/cosmin1230/Firstapp
+    targetRevision: HEAD  # Consider pinning to a specific Git tag/branch
+  syncPolicy:
+    automated:
+      prune: true      # Delete resources when removed from Git
+      selfHeal: true   # Auto-correct drift
+    syncOptions:
+    - CreateNamespace=true  # Auto-create target namespace
