@@ -15,7 +15,7 @@ spec:
     helm:
       parameters:
       - name: crds.enabled
-        value: "false"
+        value: "true"
       valueFiles:
       - values.yaml
       values: |
