@@ -24,7 +24,6 @@ spec:
           
           # Disable HTTPS features
           extraArgs:
-            default-ssl-certificate: ""
           containerPort:
             https: null
           service:
