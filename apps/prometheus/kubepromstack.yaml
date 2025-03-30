@@ -20,6 +20,7 @@ spec:
       - values.yaml
       values: |
         prometheus:
+          enabled: true 
           ingress:
             enabled: true
             annotations:
@@ -30,6 +31,18 @@ spec:
             paths:
               - /
           prometheusSpec:
+            storageSpec:  # ← Required for persistence
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: standard
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
+            resources:  # ← Prevent OOM
+              requests:
+                memory: 1Gi
+                cpu: 500m
             additionalScrapeConfigs:
               - job_name: 'ingress-controller'
                 scrape_interval: 30s
