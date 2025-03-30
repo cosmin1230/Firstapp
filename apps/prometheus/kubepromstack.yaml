@@ -13,9 +13,12 @@ spec:
     repoURL: https://prometheus-community.github.io/helm-charts
     targetRevision: 70.2.1
     helm:
+      skipCrds: false  # Explicitly handle CRDs
       parameters:
       - name: crds.enabled
-        value: "false"
+        value: "true"  # Enable CRD installation
+      - name: crds.keep
+        value: "true"  # Prevent CRD deletion
       valueFiles:
       - values.yaml
       values: |
@@ -31,6 +34,18 @@ spec:
             paths:
               - /
           prometheusSpec:
+            storageSpec:  # REQUIRED ADDITION
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: standard
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
+            resources:  # REQUIRED ADDITION
+              requests:
+                memory: 1Gi
+                cpu: 500m
             additionalScrapeConfigs:
               - job_name: 'ingress-controller'
                 scrape_interval: 30s
@@ -57,9 +72,20 @@ spec:
               - alertmanager.local
             annotations:
               kubernetes.io/ingress.class: nginx
+              nginx.ingress.kubernetes.io/rewrite-target: /
+            paths:
+              - /
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
+    - ServerSideApply=true  # CRITICAL FOR CRDs
+    - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
