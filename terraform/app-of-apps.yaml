@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/cosmin1230/Firstapp
-    targetRevision: multisource-app-of-apps
+    targetRevision: master
     path: apps
     directory:
       recurse: true

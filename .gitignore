@@ -136,4 +136,4 @@ dist
 .pnp.*
 
 # Ignore node_modules in Backend directory
-Backend/node_modules/
+myapplication/Backend/node_modules/

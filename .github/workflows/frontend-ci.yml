@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'Frontend/**'
+      - 'myapplication/Frontend/**'
       
 jobs:
   build-and-push-frontend:
@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Frontend Docker image
-        run: docker build -t cosmin12300/frontend:latest -t cosmin12300/frontend:${{ github.sha }} ./Frontend
+        run: docker build -t cosmin12300/frontend:latest -t cosmin12300/frontend:${{ github.sha }} ./myapplication/Frontend
 
       - name: Push Frontend Docker image
         run: |
@@ -32,7 +32,7 @@ jobs:
       - name: Update Helm values.yaml with new Docker tag
         run: |
           # Update the image tag in values.yaml
-          sed -i "s|cosmin12300/frontend:.*|cosmin12300/frontend:${{ github.sha }}|" chart/values.yaml
+          sed -i "s|cosmin12300/frontend:.*|cosmin12300/frontend:${{ github.sha }}|" myapplication/chart/values.yaml
           
           # Configure git
           git config --global user.name "github-actions[bot]"

@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'Backend/**'
+      - 'myapplication/Backend/**'
 
 jobs:
   build-and-push-backend:
@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Backend Docker image
-        run: docker build -t cosmin12300/backend:latest -t cosmin12300/backend:${{ github.sha }} ./Backend
+        run: docker build -t cosmin12300/backend:latest -t cosmin12300/backend:${{ github.sha }} ./myapplication/Backend
 
       - name: Push Backend Docker image
         run: |
@@ -32,7 +32,7 @@ jobs:
       - name: Update Helm values.yaml with new Docker tag
         run: |
           # Update the image tag in values.yaml
-          sed -i "s|cosmin12300/backend:.*|cosmin12300/backend:${{ github.sha }}|" chart/values.yaml
+          sed -i "s|cosmin12300/backend:.*|cosmin12300/backend:${{ github.sha }}|" myapplication/chart/values.yaml
           
           # Configure git
           git config --global user.name "github-actions[bot]"
