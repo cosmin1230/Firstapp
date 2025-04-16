@@ -11,8 +11,8 @@ spec:
   source:
     helm:
       valueFiles:
-      - values.yaml  # Helm values file (relative to `path`)
-    path: chart  # Path to Helm chart in the repo
+      - myapplication/chart/values.yaml  # Helm values file (relative to `path`)
+    path: myapplication/chart  # Path to Helm chart in the repo
     repoURL: https://github.com/cosmin1230/Firstapp
     targetRevision: HEAD  # Consider pinning to a specific Git tag/branch
   syncPolicy:

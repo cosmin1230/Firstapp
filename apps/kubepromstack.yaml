@@ -8,6 +8,20 @@ spec:
     namespace: prometheus
     server: https://kubernetes.default.svc
   project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true  # CRITICAL FOR CRDs
+    - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
   source:
     chart: kube-prometheus-stack
     repoURL: https://prometheus-community.github.io/helm-charts
@@ -16,11 +30,9 @@ spec:
       skipCrds: false  # Explicitly handle CRDs
       parameters:
       - name: crds.enabled
-        value: "true"  # Enable CRD installation
+        value: "true"  
       - name: crds.keep
-        value: "true"  # Prevent CRD deletion
-      valueFiles:
-      - values.yaml
+        value: "true" 
       values: |
         prometheus:
           enabled: true
@@ -34,6 +46,9 @@ spec:
             paths:
               - /
           prometheusSpec:
+            crds:
+              enabled: true # Enable CRD installation
+              keep: true # Prevent CRD deletion
             storageSpec:  # REQUIRED ADDITION
               volumeClaimTemplate:
                 spec:
@@ -75,17 +90,3 @@ spec:
               nginx.ingress.kubernetes.io/rewrite-target: /
             paths:
               - /
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true  # CRITICAL FOR CRDs
-    - ApplyOutOfSyncOnly=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 10s
-        factor: 2
-        maxDuration: 3m
