@@ -54,17 +54,19 @@ resource "google_project_service" "apis" {
   for_each = toset([
     "compute.googleapis.com",
     "container.googleapis.com",
-    "iam.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "serviceusage.googleapis.com"
+    "iam.googleapis.com", // Critical, will be skipped in provisioner
+    "cloudresourcemanager.googleapis.com", // Critical, will be skipped in provisioner
+    "serviceusage.googleapis.com" // Critical, will be skipped in provisioner
   ])
   service = each.key
 
   provisioner "local-exec" {
     when    = destroy
     command = <<-EOT
-      if [ "${self.service}" != "iam.googleapis.com" ]; then
-        gcloud services disable ${self.service} --project=${self.project} --quiet || true
+      if [[ "${self.service}" != "iam.googleapis.com" && \
+            "${self.service}" != "cloudresourcemanager.googleapis.com" && \
+            "${self.service}" != "serviceusage.googleapis.com" ]]; then
+        gcloud services disable ${self.service} --project=${self.project} --quiet --disable_dependent-services || true
       fi
     EOT
   }
