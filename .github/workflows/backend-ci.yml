@@ -41,6 +41,6 @@ jobs:
           # Commit and push changes
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git checkout master
-          git add myapplication/chart/values.yaml
+          git add ./myapplication/chart/values.yaml
           git commit -m "Update backend image tag to ${{ github.sha }} [skip ci]"
           git push origin master
