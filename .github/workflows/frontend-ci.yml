@@ -31,6 +31,11 @@ jobs:
 
       - name: Update Helm values.yaml with new Docker tag
         run: |
+          # Debug information
+          echo "Current directory: $(pwd)"
+          echo "Checking if values.yaml exists:"
+          ls -la myapplication/chart/values.yaml
+          
           # Update the image tag in values.yaml
           sed -i "s|cosmin12300/frontend:.*|cosmin12300/frontend:${{ github.sha }}|" myapplication/chart/values.yaml
           
@@ -41,6 +46,15 @@ jobs:
           # Commit and push changes
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git checkout master
+          
+          # Verify git status
+          git status
+          
+          # Add the file with full path
           git add myapplication/chart/values.yaml
+          
+          # Verify the file was added
+          git status
+          
           git commit -m "Update frontend image tag to ${{ github.sha }} [skip ci]"
           git push origin master
