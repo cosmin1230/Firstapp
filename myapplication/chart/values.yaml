@@ -1,5 +1,5 @@
 backend:
-  image: cosmin12300/backend:latest
+  image: cosmin12300/backend:9e549998b779aed9e0a3bc98b25868a7e17ec5ef
   replicas: 1
   resources:
     limits:
