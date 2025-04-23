@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
 
     //  Comment to trigger change
+  
     //  Function to show login form dynamically
     function showLoginForm() {
         if (authMessage) {

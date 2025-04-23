@@ -20,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 // Comment to trigger change
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Backend running on http://localhost:${PORT}`);
