@@ -10,7 +10,7 @@ backend:
       memory: 128Mi
 
 frontend:
-  image: cosmin12300/frontend:latest
+  image: cosmin12300/frontend:d714cb20c822211c45e3bc7ce24083d38d3ad69c
   replicas: 1
   resources:
       limits:
