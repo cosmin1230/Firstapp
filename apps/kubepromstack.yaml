@@ -57,10 +57,6 @@ spec:
                   resources:
                     requests:
                       storage: 10Gi
-            resources:  # REQUIRED ADDITION
-              requests:
-                memory: 1Gi
-                cpu: 500m
             additionalScrapeConfigs:
               - job_name: 'ingress-controller'
                 scrape_interval: 30s

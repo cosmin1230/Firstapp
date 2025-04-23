@@ -137,3 +137,8 @@ dist
 
 # Ignore node_modules in Backend directory
 myapplication/Backend/node_modules/
+
+# Ignore terraform files
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.*

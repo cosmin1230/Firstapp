@@ -11,10 +11,10 @@ spec:
   source:
     helm:
       valueFiles:
-      - myapplication/chart/values.yaml  # Helm values file (relative to `path`)
+      - values.yaml  # Helm values file (relative to `path`)
     path: myapplication/chart  # Path to Helm chart in the repo
     repoURL: https://github.com/cosmin1230/Firstapp
-    targetRevision: HEAD  # Consider pinning to a specific Git tag/branch
+    targetRevision: master  # Consider pinning to a specific Git tag/branch
   syncPolicy:
     automated:
       prune: true      # Delete resources when removed from Git
