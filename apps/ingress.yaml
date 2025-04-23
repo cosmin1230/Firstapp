@@ -15,33 +15,9 @@ spec:
     helm:
       values: |
         controller:
-          replicaCount: 1
-          
-          metrics:
-            enabled: true  # Required for Prometheus scraping
-          
-          # Disable HTTPS features
-          containerPort:
-            https: null
           service:
-            https:
-              enabled: false
-            targetPorts:
-              https: null
-          
-          # Configuration
-          config:
-            ssl-redirect: "false"
-          
-          # Disable admission webhooks
-          admissionWebhooks:
-            enabled: false
-        
-        # No TLS certificates
-        tls: []
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
+            type: LoadBalancer  # Expose the ingress controller via a LoadBalancer
+          ingressClassResource:
+            name: nginx
+            enabled: true
+          ingressClass: nginx
