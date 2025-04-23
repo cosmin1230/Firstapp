@@ -50,8 +50,8 @@ jobs:
           # Verify git status
           git status
           
-          # Add the file with full path
-          git add myapplication/chart/values.yaml
+          # Add all modified files
+          git add .
           
           # Verify the file was added
           git status
