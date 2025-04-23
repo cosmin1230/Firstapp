@@ -32,7 +32,7 @@ jobs:
       - name: Update Helm values.yaml with new Docker tag
         run: |
           # Update the image tag in values.yaml
-          sed -i "s|cosmin12300/frontend:.*|cosmin12300/frontend:${{ github.sha }}|" ./myapplication/chart/values.yaml
+          sed -i "s|cosmin12300/frontend:.*|cosmin12300/frontend:${{ github.sha }}|" myapplication/chart/values.yaml
           
           # Configure git
           git config --global user.name "github-actions[bot]"
@@ -41,6 +41,6 @@ jobs:
           # Commit and push changes
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git checkout master
-          git add ./myapplication/chart/values.yaml
+          git add myapplication/chart/values.yaml
           git commit -m "Update frontend image tag to ${{ github.sha }} [skip ci]"
           git push origin master
