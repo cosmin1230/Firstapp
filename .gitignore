@@ -141,5 +141,6 @@ myapplication/Backend/node_modules/
 # Ignore terraform files
 terraform/.terraform/
 terraform/.terraform.tfstate.lock.info
+terraform.tfvars
 terraform/terraform.tfstate
 terraform/terraform.tfstate.*

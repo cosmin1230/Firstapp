@@ -20,8 +20,8 @@ terraform {
 }
 
 provider "google" {
-  project     = "neat-chain-457017-u0"
-  region      = "us-central1"
+  project     = "var.gcp_project_id"
+  region      = "var.gcp_region"
   credentials = file("~/.config/gcloud/application_default_credentials.json")
 }
 
@@ -172,30 +172,11 @@ resource "helm_release" "argocd" {
 }
 
 # App of Apps Pattern
-resource "kubectl_manifest" "app_of_apps" {
-  yaml_body = <<-YAML
-    apiVersion: argoproj.io/v1alpha1
-    kind: Application
-    metadata:
-      name: app-of-apps
-      namespace: argocd
-    spec:
-      project: default
-      source:
-        repoURL: "https://github.com/cosmin1230/Firstapp"
-        targetRevision: master                            
-        path: "terraform"                                 
-      destination:
-        server: "https://kubernetes.default.svc"
-        namespace: "argocd"
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-  YAML
+resource "kubernetes_manifest" "app_of_apps" {
+  manifest = yamldecode(file("${path.module}/app-of-apps.yaml"))
 
   depends_on = [
-    helm_release.argocd,
+    helm_release.argocd,  # Ensure Argo CD is deployed first
     kubernetes_namespace.argocd
   ]
 }
