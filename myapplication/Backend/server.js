@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
     res.send("Backend for PC Parts App");
 });
 
+// comment to trigger change
 // Start the server
 app.listen(PORT, () => {
     console.log(`Backend running on http://localhost:${PORT}`);
