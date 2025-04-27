@@ -171,7 +171,8 @@ resource "kubernetes_manifest" "app_of_apps" {
   manifest = yamldecode(file("${path.module}/app-of-apps.yaml"))
 
   depends_on = [
-    helm_release.argocd,  # Ensure Argo CD is deployed first
-    kubernetes_namespace.argocd
+    google_container_node_pool.nodes,  # Ensure the GKE node pool is ready
+    helm_release.argocd,              # Ensure Argo CD is installed
+    kubernetes_namespace.argocd       # Ensure the namespace exists
   ]
 }
