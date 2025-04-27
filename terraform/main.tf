@@ -20,9 +20,8 @@ terraform {
 }
 
 provider "google" {
-  project     = "var.gcp_project_id"
-  region      = "var.gcp_region"
-  credentials = file("~/.config/gcloud/application_default_credentials.json")
+  project     = var.gcp_project_id
+  region      = var.gcp_region
 }
 
 data "google_client_config" "default" {}
@@ -74,15 +73,15 @@ resource "google_project_service" "apis" {
 
 # Network resources
 resource "google_compute_network" "vpc" {
-  name                    = "my-vpc"
+  name                    = var.vpc_name
   auto_create_subnetworks = false
   depends_on              = [google_project_service.apis]
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "my-subnet"
-  ip_cidr_range = "10.0.1.0/24"
-  region        = "us-central1"
+  name          = var.subnet_name
+  ip_cidr_range = var.subnet_cidr
+  region        = var.gcp_region
   network       = google_compute_network.vpc.id
 }
 
@@ -96,7 +95,7 @@ resource "google_compute_firewall" "allow_ssh" {
     ports    = ["22"]
   }
 
-  source_ranges = ["79.177.153.240/32"]
+  source_ranges = var.ssh_source_ranges
 }
 
 resource "google_compute_firewall" "allow_http" {
@@ -108,13 +107,13 @@ resource "google_compute_firewall" "allow_http" {
     ports    = ["80", "443"]
   }
 
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = var.http_source_ranges
 }
 
 # GKE Cluster
 resource "google_container_cluster" "gke" {
-  name     = "my-gke-cluster"
-  location = "us-central1-a"
+  name     = var.gke_cluster_name
+  location = var.gcp_region
 
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
@@ -127,41 +126,37 @@ resource "google_container_cluster" "gke" {
 }
 
 resource "google_container_node_pool" "nodes" {
-  name       = "my-node-pool"
+  name       = var.node_pool_name
   cluster    = google_container_cluster.gke.id
-  location   = "us-central1-a"
+  location   = var.gcp_region
 
   autoscaling {
-    min_node_count = 1
-    max_node_count = 3
+    min_node_count = var.node_pool_min_count
+    max_node_count = var.node_pool_max_count
   }
 
   node_config {
-    machine_type = "e2-medium"
-    disk_size_gb = 30
-    disk_type = "pd-standard"
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/devstorage.read_only",
-      "https://www.googleapis.com/auth/logging.write",
-      "https://www.googleapis.com/auth/monitoring"
-    ]
+    machine_type = var.node_machine_type
+    disk_size_gb = var.node_disk_size
+    disk_type = var.node_disk_type
+    oauth_scopes = var.node_oauth_scopes
   }
 }
 
 # ArgoCD Installation
 resource "kubernetes_namespace" "argocd" {
   metadata {
-    name = "argocd"
+    name = var.argocd_namespace
   }
   depends_on = [google_container_node_pool.nodes]
 }
 
 resource "helm_release" "argocd" {
   name       = "argocd"
-  namespace  = "argocd"
+  namespace  = var.argocd_namespace
   chart      = "argo-cd"
   repository = "https://argoproj.github.io/argo-helm"
-  version    = "7.8.26"
+  version    = var.argocd_chart_version
   atomic = true
 
   values = [
