@@ -143,15 +143,6 @@ resource "google_container_node_pool" "nodes" {
   }
 }
 
-# Delay to wait for GKE readiness
-  resource "null_resource" "wait_for_gke" {
-  depends_on = [google_container_node_pool.nodes]
-
-  provisioner "local-exec" {
-    command = "echo 'Waiting for GKE cluster to be ready...' && sleep 60"
-  }
-}
-
 # ArgoCD Installation
 resource "kubernetes_namespace" "argocd" {
   metadata {
@@ -176,13 +167,12 @@ resource "helm_release" "argocd" {
 }
 
 # App of Apps Pattern
-resource "kubernetes_manifest" "app_of_apps" {
-  manifest = yamldecode(file("${path.module}/app-of-apps.yaml"))
+resource "kubectl_manifest" "app_of_apps" {
+  yaml_body = file("${path.module}/app-of-apps.yaml")
 
   depends_on = [
-    null_resource.wait_for_gke,  # Ensure GKE is ready
-    google_container_node_pool.nodes,  # Ensure the GKE node pool is ready
-    helm_release.argocd,              # Ensure Argo CD is installed
-    kubernetes_namespace.argocd,       # Ensure the namespace exists
+    null_resource.wait_for_cluster,
+    helm_release.argocd,
+    kubernetes_namespace.argocd
   ]
 }
