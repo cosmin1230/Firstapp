@@ -171,7 +171,7 @@ resource "kubectl_manifest" "app_of_apps" {
   yaml_body = file("${path.module}/app-of-apps.yaml")
 
   depends_on = [
-    null_resource.wait_for_cluster,
+    google_container_node_pool.nodes,
     helm_release.argocd,
     kubernetes_namespace.argocd
   ]
