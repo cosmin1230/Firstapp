@@ -113,7 +113,7 @@ resource "google_compute_firewall" "allow_http" {
 # GKE Cluster
 resource "google_container_cluster" "gke" {
   name     = var.gke_cluster_name
-  location = var.gcp_region
+  location = var.gcp_zone
 
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
@@ -128,7 +128,7 @@ resource "google_container_cluster" "gke" {
 resource "google_container_node_pool" "nodes" {
   name       = var.node_pool_name
   cluster    = google_container_cluster.gke.id
-  location   = var.gcp_region
+  location   = var.gcp_zone
 
   autoscaling {
     min_node_count = var.node_pool_min_count
@@ -140,6 +140,15 @@ resource "google_container_node_pool" "nodes" {
     disk_size_gb = var.node_disk_size
     disk_type = var.node_disk_type
     oauth_scopes = var.node_oauth_scopes
+  }
+}
+
+# Delay to wait for GKE readiness
+  resource "null_resource" "wait_for_gke" {
+  depends_on = [google_container_node_pool.nodes]
+
+  provisioner "local-exec" {
+    command = "echo 'Waiting for GKE cluster to be ready...' && sleep 60"
   }
 }
 
@@ -171,6 +180,7 @@ resource "kubernetes_manifest" "app_of_apps" {
   manifest = yamldecode(file("${path.module}/app-of-apps.yaml"))
 
   depends_on = [
+    null_resource.wait_for_gke,  # Ensure GKE is ready
     google_container_node_pool.nodes,  # Ensure the GKE node pool is ready
     helm_release.argocd,              # Ensure Argo CD is installed
     kubernetes_namespace.argocd,       # Ensure the namespace exists
