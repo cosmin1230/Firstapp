@@ -144,3 +144,6 @@ terraform/.terraform.tfstate.lock.info
 terraform.tfvars
 terraform/terraform.tfstate
 terraform/terraform.tfstate.*
+test/.terraform
+test/.terraform.tfstate.lock.info
+test/terraform.tfvars
