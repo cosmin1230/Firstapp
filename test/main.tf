@@ -23,10 +23,11 @@ data "aws_availability_zones" "available" {
 
 # Create a public subnet
 resource "aws_subnet" "public_subnet" {
-  count = 2
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = cidrsubnet(var.vpc_cidr_block, 4, count.index)
-  availability_zone = data.aws_availability_zones.available.names[count.index]
+  count = var.enable_public_subnets ? var.az_count : 0
+
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, 4, count.index)
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
 
   tags = {
@@ -36,11 +37,12 @@ resource "aws_subnet" "public_subnet" {
 
 # Create a private subnet
 resource "aws_subnet" "private_subnet" {
-  count = 2
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = cidrsubnet(var.vpc_cidr_block, 4, count.index + 2)
+  count = var.enable_private_subnets ? var.az_count : 0
+
+  vpc_id            = aws_vpc.my_vpc.id
+  cidr_block        = cidrsubnet(var.vpc_cidr_block, 4, count.index + 2)
   availability_zone = data.aws_availability_zones.available.names[count.index]
-  
+
   tags = {
     Name = "${var.vpc_name}-private-subnet-${data.aws_availability_zones.available.names[count.index]}"
   }
@@ -62,7 +64,8 @@ resource "aws_route_table" "public_route_table" {
 
 # Create a private route table  
 resource "aws_route_table" "private_route_table" {
-  count = 2
+  count = var.enable_private_subnets ? var.az_count : 0
+
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
@@ -73,7 +76,7 @@ resource "aws_route_table" "private_route_table" {
 # Create a NAT Gateway
 # EIP for the NAT Gateway
 resource "aws_eip" "nat_eip" {
-  count = 2
+  count  = var.enable_private_subnets ? var.az_count : 0
   domain = "vpc"
 
   tags = {
@@ -82,11 +85,11 @@ resource "aws_eip" "nat_eip" {
 
   depends_on = [
     aws_internet_gateway.my_igw
-   ]
+  ]
 }
 
 resource "aws_nat_gateway" "my_nat_gateway" {
-  count = 2
+  count         = var.enable_private_subnets ? var.az_count : 0
   allocation_id = aws_eip.nat_eip[count.index].id
   subnet_id     = aws_subnet.public_subnet[count.index].id
 
@@ -101,11 +104,11 @@ resource "aws_nat_gateway" "my_nat_gateway" {
 
 # Update the private route table to direct outbound traffic to the NAT Gateway
 resource "aws_route" "private_route" {
-  count = 2
+  count                  = var.enable_private_subnets ? var.az_count : 0
   route_table_id         = aws_route_table.private_route_table[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.my_nat_gateway[count.index].id
-  
+
   depends_on = [
     aws_nat_gateway.my_nat_gateway
   ]
@@ -113,14 +116,14 @@ resource "aws_route" "private_route" {
 
 # Associate the public route table with the public subnet
 resource "aws_route_table_association" "public_subnet_association" {
-  count = 2
+  count          = var.enable_public_subnets ? var.az_count : 0
   subnet_id      = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.public_route_table.id
-} 
+}
 
 # Associate the private route table with the private subnet
 resource "aws_route_table_association" "private_subnet_association" {
-  count = 2
+  count          = var.enable_private_subnets ? var.az_count : 0
   subnet_id      = aws_subnet.private_subnet[count.index].id
   route_table_id = aws_route_table.private_route_table[count.index].id
 }
