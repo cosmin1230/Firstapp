@@ -7,7 +7,7 @@ variable "vpc_cidr_block" {
 variable "vpc_name" {
   description = "Base name for all resources"
   type        = string
-  default     = "my_vpc"
+  default     = "my-vpc"
 }
 
 variable "az_count" {

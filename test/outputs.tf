@@ -1,7 +1,7 @@
 # Outputs to display the created resources
 output "vpc_id" {
   description = "The ID of the VPC"
-  value       = aws_vpc.my_vpc.id
+  value       = aws_vpc.vpc.id
 }
 
 output "public_subnet_id" {
@@ -16,7 +16,7 @@ output "private_subnet_id" {
 
 output "nat_gateway_id" {
   description = "The ID of the NAT Gateway"
-  value       = aws_nat_gateway.my_nat_gateway[*].id
+  value       = aws_nat_gateway.nat_gateway[*].id
 }
 
 output "nat_eip_public_ips" {
