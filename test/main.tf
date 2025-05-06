@@ -1,6 +1,7 @@
 data "aws_availability_zones" "available" {
   state = "available"
 }
+data "aws_region" "current" {}
 
 locals {
   newbits = var.az_count * 2
@@ -127,6 +128,21 @@ resource "aws_route" "private_route" {
   depends_on = [
     aws_nat_gateway.nat_gateway
   ]
+}
+
+# S3 VPC Gateway Endpoint
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.vpc.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = concat(
+    aws_route_table.public_route_table[*].id,
+    aws_route_table.private_route_table[*].id
+  )
+
+  tags = {
+    Name = "${var.vpc_name}-s3-endpoint"
+  }
 }
 
 # Associate the public route table with the public subnet
