@@ -4,22 +4,26 @@ output "vpc_id" {
   value       = aws_vpc.vpc.id
 }
 
-output "public_subnet_id" {
-  description = "The ID of the public subnet"
+output "public_subnet_ids" {
+  description = "IDs of the public subnets"
   value       = aws_subnet.public_subnet[*].id
 }
 
-output "private_subnet_id" {
-  description = "The ID of the private subnet"
+output "private_subnet_ids" {
+  description = "IDs of the private subnets"
   value       = aws_subnet.private_subnet[*].id
 }
 
 output "nat_gateway_id" {
-  description = "The ID of the NAT Gateway"
-  value       = aws_nat_gateway.nat_gateway[*].id
+  description = "The IDs of the NAT Gateways"
+  value = {
+    for k, nat in aws_nat_gateway.nat_gateway : k => nat.id
+  }
 }
 
 output "nat_eip_public_ips" {
   description = "List of Elastic IPs for NAT Gateways"
-  value       = aws_eip.nat_eip[*].public_ip
+  value = {
+    for k, eip in aws_eip.nat_eip : k => eip.public_ip
+  }
 }

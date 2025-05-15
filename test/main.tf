@@ -15,7 +15,11 @@ locals {
     for i in range(var.az_count) :
     cidrsubnet(var.vpc_cidr_block, local.newbits, i + var.az_count)
   ]
+  
+  # Create NAT resources only if both public and private subnets are enabled
+  create_nat = var.enable_private_subnets && var.enable_public_subnets
 }
+
 # Create a VPC
 resource "aws_vpc" "vpc" {
   cidr_block       = var.vpc_cidr_block
@@ -92,7 +96,7 @@ resource "aws_route_table" "private_route_table" {
 # Create a NAT Gateway
 # EIP for the NAT Gateway
 resource "aws_eip" "nat_eip" {
-  count  = var.enable_private_subnets && var.enable_public_subnets ? var.az_count : 0
+  count  = local.create_nat ? var.az_count : 0
   domain = "vpc"
 
   tags = {
@@ -105,7 +109,7 @@ resource "aws_eip" "nat_eip" {
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
-  count         = var.enable_private_subnets && var.enable_public_subnets ? var.az_count : 0
+  count         = local.create_nat ? var.az_count : 0
   allocation_id = aws_eip.nat_eip[count.index].id
   subnet_id     = aws_subnet.public_subnet[count.index].id
 
@@ -135,10 +139,11 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.vpc.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_endpoint_type = "Gateway"
-  route_table_ids   = concat(
-    aws_route_table.public_route_table[*].id,
-    aws_route_table.private_route_table[*].id
+  route_table_ids = concat(
+    var.enable_public_subnets ? aws_route_table.public_route_table[*].id : [],
+    (var.enable_private_subnets && var.enable_public_subnets) ? aws_route_table.private_route_table[*].id : []
   )
+
 
   tags = {
     Name = "${var.vpc_name}-s3-endpoint"
