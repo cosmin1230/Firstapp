@@ -56,10 +56,10 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.24"
+  version = "~> 20.22"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.30"
+  cluster_version = "1.33"
 
   # Give the Terraform identity admin access to the cluster
   # which will allow it to deploy resources into the cluster
@@ -67,11 +67,20 @@ module "eks" {
   cluster_endpoint_public_access           = true
 
   cluster_addons = {
-    # Enable after creation to run on Karpenter managed nodes
     coredns                = {
-      addon_version = "v1.11.3-eksbuild.1"
+      addon_version = "v1.12.2-eksbuild.4"
       configuration_values = jsonencode({
-        computeType = "Fargate"
+        computeType = "fargate"
+        resources = {
+          limits = {
+            cpu    = "0.25"
+            memory = "256M"
+          }
+          requests = {
+            cpu    = "0.25"
+            memory = "256M"
+          }
+        }
       })
     }
     eks-pod-identity-agent = {}
@@ -91,16 +100,16 @@ module "eks" {
     karpenter = {
       selectors = [{ namespace = "karpenter" }]
     }
-    kube_system = {
-      selectors = [{ namespace = "kube-system" }]
-    }
     coredns = {
       name         = "coredns"
-      cluster_name = local.cluster_name
-      subnet_ids   = module.vpc.private_subnet_ids
-      selectors = [{
-        namespace = "kube-system"
-      }]
+      selectors = [
+        {
+          namespace = "kube-system"
+          labels = {
+            k8s-app = "kube-dns"
+          }
+        }
+      ]
     }
   }
 
@@ -111,29 +120,34 @@ module "eks" {
 
 data "aws_eks_cluster" "eks_cluster" {
   name = module.eks.cluster_name
+  depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "eks_auth" {
   name = module.eks.cluster_name
+  depends_on = [module.eks]
 }
 
 # Karpenter module
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~> 20.24"
+  version = "~> 20.22"
 
   cluster_name          = module.eks.cluster_name
-  enable_v1_permissions = true
   namespace             = "karpenter"
+
+  enable_irsa            = true
+  irsa_oidc_provider_arn = module.eks.oidc_provider_arn
+  irsa_namespace_service_accounts = ["karpenter:karpenter"]
 
   # Name needs to match role name passed to the EC2NodeClass
   node_iam_role_use_name_prefix = false
   node_iam_role_name            = local.name
 
-  # EKS Fargate does not support pod identity
   create_pod_identity_association = false
-  enable_irsa                     = true
-  irsa_oidc_provider_arn          = module.eks.oidc_provider_arn
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  }
 
   tags = local.tags
 }
@@ -176,24 +190,32 @@ resource "helm_release" "karpenter" {
 
   values = [
     <<-EOT
-    dnsPolicy: Default
+    serviceAccount:
+      name: ${module.karpenter.service_account}
+      annotations:
+        eks.amazonaws.com/role-arn: ${module.karpenter.iam_role_arn}
     settings:
       clusterName: ${module.eks.cluster_name}
       clusterEndpoint: ${module.eks.cluster_endpoint}
       interruptionQueue: ${module.karpenter.queue_name}
-    serviceAccount:
-      annotations:
-        eks.amazonaws.com/role-arn: ${module.karpenter.iam_role_arn}
-    webhook:
-      enabled: false
+    tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: eks.amazonaws.com/compute-type
+        operator: Equal
+        value: fargate
+        effect: NoSchedule
+    controller:
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 1024Mi
+        limits:
+          cpu: 1000m
+          memory: 1024Mi
     EOT
   ]
 
-  lifecycle {
-    ignore_changes = [
-      repository_password
-    ]
-  }
   depends_on = [
     module.eks,
     module.karpenter
@@ -201,7 +223,7 @@ resource "helm_release" "karpenter" {
 }
 
 resource "kubectl_manifest" "karpenter_config" {
-  yaml_body = file("{$path.module}/karpenter.yaml")
+  yaml_body = file("${path.module}/karpenter.yaml")
   depends_on = [
     helm_release.karpenter
   ]
@@ -221,7 +243,10 @@ resource "helm_release" "argocd" {
   version    = var.argocd_chart_version
   atomic     = true
   values     = [file("${path.module}/values.yaml")]
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [kubernetes_namespace.argocd,
+                module.eks,
+                module.karpenter,
+                helm_release.karpenter]
 }
 
 resource "kubectl_manifest" "app_of_apps" {
