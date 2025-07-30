@@ -88,6 +88,9 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
+    aws-ebs-csi-driver = {
+      most_recent = true
+    }
   }
 
   vpc_id     = module.vpc.vpc_id
@@ -237,6 +240,13 @@ resource "kubectl_manifest" "karpenter_config" {
   })
   depends_on = [
     helm_release.karpenter
+   ]
+}
+
+resource "kubectl_manifest" "karpenter_nodepool" {
+  yaml_body = file("${path.module}/nodepool.yaml")
+  depends_on = [
+    kubectl_manifest.karpenter_config
    ]
 }
 

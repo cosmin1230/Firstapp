@@ -7,21 +7,5 @@ server:
     hostname: argocd.local
     ingressClassName: nginx
     tls: []
-  nodeSelector:
-    eks.amazonaws.com/compute-type: ec2
-
-controller:
-  nodeSelector:
-    eks.amazonaws.com/compute-type: ec2
-
-repoServer:
-  nodeSelector:
-    eks.amazonaws.com/compute-type: ec2
-
-applicationSet:
-  nodeSelector:
-    eks.amazonaws.com/compute-type: ec2
-
-redis:
-  nodeSelector:
-    eks.amazonaws.com/compute-type: ec2
+dex:
+  enabled: false
