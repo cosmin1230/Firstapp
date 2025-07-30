@@ -39,6 +39,7 @@ locals {
   tags = merge(var.tags, {
     Terraform   = "true"
     Environment = var.environment
+    "karpenter.sh/discovery" = local.cluster_name
   })
 }
 
@@ -50,6 +51,7 @@ module "vpc" {
   az_count               = var.az_count
   enable_public_subnets  = var.enable_public_subnets
   enable_private_subnets = var.enable_private_subnets
+  cluster_name = local.name
 }
 
 # EKS Module
@@ -123,11 +125,6 @@ data "aws_eks_cluster" "eks_cluster" {
   depends_on = [module.eks]
 }
 
-data "aws_eks_cluster_auth" "eks_auth" {
-  name = module.eks.cluster_name
-  depends_on = [module.eks]
-}
-
 # Karpenter module
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
@@ -142,7 +139,7 @@ module "karpenter" {
 
   # Name needs to match role name passed to the EC2NodeClass
   node_iam_role_use_name_prefix = false
-  node_iam_role_name            = local.name
+  node_iam_role_name = "${local.name}-karpenter-node"
 
   create_pod_identity_association = false
   node_iam_role_additional_policies = {
@@ -155,15 +152,24 @@ module "karpenter" {
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.eks_auth.token 
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+  }
 }
 
 provider "kubectl" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.eks_auth.token
   load_config_file       = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+  }
 }
+
 
 provider "helm" {
   kubernetes = {
@@ -186,7 +192,8 @@ resource "helm_release" "karpenter" {
   repository_password = data.aws_ecrpublic_authorization_token.token.password
   chart               = "karpenter"
   version             = "1.6.1"
-  wait                = false
+  wait                = true
+  atomic              = true
 
   values = [
     <<-EOT
@@ -223,10 +230,14 @@ resource "helm_release" "karpenter" {
 }
 
 resource "kubectl_manifest" "karpenter_config" {
-  yaml_body = file("${path.module}/karpenter.yaml")
+  yaml_body = templatefile("${path.module}/karpenter.yaml", {
+    node_iam_role_name   = module.karpenter.node_iam_role_name
+    cluster_name         = module.eks.cluster_name
+    availability_zones   = jsonencode(module.vpc.azs)
+  })
   depends_on = [
     helm_release.karpenter
-  ]
+   ]
 }
 
 resource "kubernetes_namespace" "argocd" {

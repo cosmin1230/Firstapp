@@ -27,3 +27,8 @@ output "nat_eip_public_ips" {
     for k, eip in aws_eip.nat_eip : k => eip.public_ip
   }
 }
+
+output "azs" {
+  description = "A list of availability zones in which the VPC subnets were created."
+  value       = slice(data.aws_availability_zones.available.names, 0, var.az_count)
+}
