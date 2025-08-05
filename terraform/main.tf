@@ -88,11 +88,6 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
-    # Apply after karpenter nodepool is created
-    aws-ebs-csi-driver = {
-      most_recent = true
-      service_account_role_arn = aws_iam_role.ebs_csi_driver_role.arn
-    }
   }
 
   vpc_id     = module.vpc.vpc_id
@@ -279,6 +274,36 @@ resource "kubectl_manifest" "karpenter_nodepool" {
   depends_on = [
     kubectl_manifest.karpenter_config
    ]
+}
+
+resource "helm_release" "aws_ebs_csi_driver" {
+  name       = "aws-ebs-csi-driver"
+  namespace  = "kube-system"
+  
+  repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+  chart      = "aws-ebs-csi-driver"
+  
+  version    = "2.29.0"
+  wait       = true
+  atomic     = true
+
+  values = [
+    yamlencode({
+      controller = {
+        serviceAccount = {
+          create = true
+          name   = "ebs-csi-controller-sa"
+          annotations = {
+            "eks.amazonaws.com/role-arn" = aws_iam_role.ebs_csi_driver_role.arn
+          }
+        }
+      }
+    })
+  ]
+
+  depends_on = [
+    kubectl_manifest.karpenter_nodepool
+  ]
 }
 
 resource "kubernetes_namespace" "argocd" {
