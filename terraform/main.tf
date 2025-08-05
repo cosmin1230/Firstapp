@@ -91,6 +91,7 @@ module "eks" {
     # Apply after karpenter nodepool is created
     aws-ebs-csi-driver = {
       most_recent = true
+      service_account_role_arn = aws_iam_role.ebs_csi_driver_role.arn
     }
   }
 
@@ -127,6 +128,35 @@ module "eks" {
 data "aws_eks_cluster" "eks_cluster" {
   name = module.eks.cluster_name
   depends_on = [module.eks]
+}
+
+resource "aws_iam_role" "ebs_csi_driver_role" {
+  name = "${local.name}-ebs-csi-driver-role"
+
+  assume_role_policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        }
+        Action    = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${module.eks.oidc_provider}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.ebs_csi_driver_role.name
 }
 
 # Karpenter module
