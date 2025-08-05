@@ -88,6 +88,7 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
+    # Apply after karpenter nodepool is created
     aws-ebs-csi-driver = {
       most_recent = true
     }
@@ -267,7 +268,8 @@ resource "helm_release" "argocd" {
   depends_on = [kubernetes_namespace.argocd,
                 module.eks,
                 module.karpenter,
-                helm_release.karpenter]
+                helm_release.karpenter,
+                resource.kubectl_manifest.karpenter_nodepool]
 }
 
 resource "kubectl_manifest" "app_of_apps" {

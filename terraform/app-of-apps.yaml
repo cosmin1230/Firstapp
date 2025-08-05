@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/cosmin1230/Firstapp
-    targetRevision: master
+    targetRevision: eksmigration
     path: apps
     directory:
       recurse: true
