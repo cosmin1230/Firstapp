@@ -86,3 +86,9 @@ spec:
               nginx.ingress.kubernetes.io/rewrite-target: /
             paths:
               - /
+
+        prometheus-node-exporter:
+          affinity: {}
+
+          nodeSelector:
+            eks.amazonaws.com/compute-type: ec2
