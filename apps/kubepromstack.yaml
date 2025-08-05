@@ -52,7 +52,7 @@ spec:
             storageSpec:  # REQUIRED ADDITION
               volumeClaimTemplate:
                 spec:
-                  storageClassName: standard
+                  storageClassName: gp2
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
