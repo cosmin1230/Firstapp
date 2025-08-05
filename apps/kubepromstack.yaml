@@ -45,6 +45,9 @@ spec:
               - prometheus.local
             paths:
               - /
+          service:
+            selector:
+              app.kubernetes.io/name: prometheus
           prometheusSpec:
             crds:
               enabled: true # Enable CRD installation
