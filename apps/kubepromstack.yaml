@@ -89,6 +89,5 @@ spec:
 
         prometheus-node-exporter:
           affinity: {}
-
           nodeSelector:
             eks.amazonaws.com/compute-type: ec2

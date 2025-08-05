@@ -28,6 +28,11 @@ spec:
                 prometheus.io/scrape: "true"
                 prometheus.io/port: "10254"
                 prometheus.io/path: /metrics
+        admissionWebhooks:
+          patch:
+            enabled: true
+            nodeSelector:
+              "kubernetes.io/os": linux
   syncPolicy:
     automated:
       prune: true
