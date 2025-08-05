@@ -52,6 +52,15 @@ spec:
             storageSpec:  # REQUIRED ADDITION
               volumeClaimTemplate:
                 spec:
+                  affinity:
+                    nodeAffinity:
+                      requiredDuringSchedulingIgnoredDuringExecution:
+                        nodeSelectorTerms:
+                          - matchExpressions:
+                              - key: eks.amazonaws.com/compute-type
+                                operator: NotIn
+                                values:
+                                  - fargate
                   storageClassName: gp2
                   accessModes: ["ReadWriteOnce"]
                   resources:
@@ -86,8 +95,3 @@ spec:
               nginx.ingress.kubernetes.io/rewrite-target: /
             paths:
               - /
-
-        prometheus-node-exporter:
-          affinity: {}
-          nodeSelector:
-            eks.amazonaws.com/compute-type: ec2
