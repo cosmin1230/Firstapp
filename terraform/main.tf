@@ -67,6 +67,10 @@ module "eks" {
   # which will allow it to deploy resources into the cluster
   enable_cluster_creator_admin_permissions = true
   cluster_endpoint_public_access           = true
+  
+  cluster_encryption_config = {
+    enable_encryption = false
+  }
 
   cluster_addons = {
     coredns                = {
