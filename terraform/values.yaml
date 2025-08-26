@@ -7,3 +7,5 @@ server:
     hostname: argocd.local
     ingressClassName: nginx
     tls: []
+dex:
+  enabled: false

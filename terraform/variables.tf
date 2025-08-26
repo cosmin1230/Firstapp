@@ -1,103 +1,60 @@
-variable "gcp_project_id" {
-  description = "The GCP project ID"
+variable "aws_region" {
+  description = "AWS region"
   type        = string
+  default     = "us-west-2"
 }
 
-variable "gcp_region" {
-  description = "The GCP region"
+variable "cluster_name" {
+  description = "EKS cluster name"
   type        = string
+  default     = "firstapp"
 }
 
-variable "gcp_zone" {
-  description = "The GCP zone"
+variable "cluster_version" {
+  description = "EKS cluster version"
   type        = string
+  default     = "1.30"
 }
 
-variable "gcp_credentials_file" {
-  description = "Path to the GCP credentials file"
+variable "environment" {
+  description = "Environment name"
   type        = string
+  default     = "dev"
 }
 
-variable "vpc_name" {
-  description = "Name of the VPC"
+variable "tags" {
+  description = "Additional tags"
+  type        = map(string)
+  default     = {}
+}
+
+# VPC Module Variables
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
   type        = string
-  default     = "my-vpc"
+  default     = "10.0.0.0/16"
 }
 
-variable "subnet_name" {
-  description = "Name of the subnet"
-  type        = string
-  default     = "my-subnet"
-}
-
-variable "subnet_cidr" {
-  description = "CIDR range for the subnet"
-  type        = string
-  default     = "10.0.1.0/24"
-}
-
-variable "ssh_source_ranges" {
-  description = "Allowed source ranges for SSH"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
-variable "http_source_ranges" {
-  description = "Allowed source ranges for HTTP/HTTPS"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
-variable "gke_cluster_name" {
-  description = "Name of the GKE cluster"
-  type        = string
-  default     = "my-gke-cluster"
-}
-
-variable "node_pool_name" {
-  description = "Name of the GKE node pool"
-  type        = string
-  default     = "my-node-pool"
-}
-
-variable "node_pool_min_count" {
-  description = "Minimum number of nodes in the node pool"
+variable "az_count" {
+  description = "Number of AZs to use"
   type        = number
-  default     = 1
+  default     = 2
+  validation {
+    condition     = var.az_count >= 1 && var.az_count <= 4
+    error_message = "AZ count must be between 1 and 4."
+  }
 }
 
-variable "node_pool_max_count" {
-  description = "Maximum number of nodes in the node pool"
-  type        = number
-  default     = 3
+variable "enable_public_subnets" {
+  description = "Whether to create public subnets"
+  type        = bool
+  default     = true
 }
 
-variable "node_machine_type" {
-  description = "Machine type for GKE nodes"
-  type        = string
-  default     = "e2-medium"
-}
-
-variable "node_disk_size" {
-  description = "Disk size for GKE nodes"
-  type        = number
-  default     = 30
-}
-
-variable "node_disk_type" {
-  description = "Disk type for GKE nodes"
-  type        = string
-  default     = "pd-standard"
-}
-
-variable "node_oauth_scopes" {
-  description = "OAuth scopes for GKE nodes"
-  type        = list(string)
-  default     = [
-    "https://www.googleapis.com/auth/devstorage.read_only",
-    "https://www.googleapis.com/auth/logging.write",
-    "https://www.googleapis.com/auth/monitoring"
-  ]
+variable "enable_private_subnets" {
+  description = "Whether to create private subnets"
+  type        = bool
+  default     = true
 }
 
 variable "argocd_namespace" {

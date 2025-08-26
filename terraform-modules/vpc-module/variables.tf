@@ -31,3 +31,8 @@ variable "enable_private_subnets" {
   type        = bool
   default     = true
 }
+
+variable "cluster_name" {
+  description = "The name of the EKS cluster for resource tagging."
+  type        = string
+}
