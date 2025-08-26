@@ -92,40 +92,81 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 
 ## 🏗️ Architecture Overview
 
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                           🔧 GitHub Repository                                     │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│  📁 Source Code    📁 Terraform IaC    📁 Helm Charts    📁 GitOps Config         │
-└─────────────────────┬───────────────────────────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                        🚀 CI/CD Pipeline                                           │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│  ⚙️ GitHub Actions  ➜  🐳 Docker Registry  ➜  🎯 ArgoCD GitOps                    │
-└─────────────────────┬───────────────────────────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                      ☁️ AWS Cloud Infrastructure                                   │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│                              🏢 VPC Network                                        │
-│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
-│  │                        ⚓ EKS Cluster                                       │   │
-│  │                                                                             │   │
-│  │  🎛️ Control Plane        📦 Worker Nodes        💾 Storage                │   │
-│  │  ├─ Kubernetes API       ├─ Fargate Profiles     ├─ EBS CSI Driver         │   │
-│  │  └─ RBAC & Policies      └─ Karpenter Nodes      └─ Persistent Volumes     │   │
-│  │                                                                             │   │
-│  │  🌐 Applications          📊 Platform Services                             │   │
-│  │  ├─ Frontend Pods         ├─ NGINX Ingress                                 │   │
-│  │  ├─ Backend Pods          ├─ Prometheus                                    │   │
-│  │  └─ MySQL StatefulSet     ├─ Grafana                                       │   │
-│  │                           └─ Alertmanager                                  │   │
-│  └─────────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                     │
-│  🔗 Application Load Balancer  ➜  Ingress Controller  ➜  Application Services     │
-└─────────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    %% Define Styles
+    classDef source fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef pipeline fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    classDef aws fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px;
+    classDef gitops fill:#fffde7,stroke:#f57f17,stroke-width:2px;
+    classDef appstack fill:#fce4ec,stroke:#880e4f,stroke-width:2px;
+    classDef monitoring fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+
+    %% STAGE 1: Source of Truth
+    subgraph " "
+        subgraph "Source of Truth"
+            direction LR
+            Repo[("fa:fa-git-alt GitHub Repo")]
+        end
+    end
+
+    %% STAGE 2: CI Automation Pipeline
+    subgraph " "
+      subgraph "CI Automation (External)"
+          direction TB
+          GHA[GitHub Actions] --> Docker[("fa:fa-docker Docker Registry")];
+          GHA -->|Updates image tag| Repo;
+      end
+    end
+
+    %% STAGE 3: AWS Live Environment
+    subgraph "AWS Cloud Environment"
+        direction TB
+        ALB[Application Load Balancer]
+
+        subgraph "Kubernetes Cluster (EKS)"
+            direction TB
+            
+            subgraph "GitOps Controller"
+                ArgoCD[ArgoCD]
+            end
+
+            subgraph "Application Stack"
+                direction TB
+                Ingress[NGINX Ingress] --> Frontend[Frontend Pods];
+                Frontend --> Backend[Backend Pods];
+                Backend --> DB[("fa:fa-database MySQL<br/>StatefulSet")];
+            end
+            
+            subgraph "Observability Stack"
+                direction TB
+                Prom[Prometheus] --> Graf[Grafana];
+                Prom --> Alert[Alertmanager];
+            end
+
+            subgraph "Cluster Autoscaling"
+                Karpenter[Karpenter]
+            end
+        end
+        EBS[("EBS Volume<br/>Persistent Storage")]
+    end
+
+    %% Define Connections
+    Repo -- Triggers --> GHA;
+    ArgoCD -- Pulls Config From --> Repo;
+    ArgoCD -- Deploys / Manages --> Ingress & Frontend & Backend & DB & Prom & Graf;
+    
+    ALB -- User Traffic --> Ingress;
+    DB -- Stores Data On --> EBS;
+    Prom -- Scrapes Metrics From --> Frontend & Backend & Ingress;
+
+    %% Apply Styles
+    class Repo source;
+    class GHA,Docker pipeline;
+    class ALB,EBS,Karpenter aws;
+    class ArgoCD gitops;
+    class Ingress,Frontend,Backend,DB appstack;
+    class Prom,Graf,Alert monitoring;
 
 ---
 
