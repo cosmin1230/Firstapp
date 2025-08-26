@@ -92,70 +92,40 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 
 ## 🏗️ Architecture Overview
 
-graph TB
-    subgraph GitHub["🔧 GitHub Repository"]
-        Code[Source Code]
-        IaC[Terraform Modules]
-        Helm[Helm Charts]
-        GitOps[GitOps Config]
-    end
-
-    subgraph Pipeline["🚀 CI/CD Pipeline"]
-        GHA[GitHub Actions]
-        DockerReg[Docker Registry]
-        ArgoCD[ArgoCD GitOps]
-    end
-
-    subgraph AWS["☁️ AWS Cloud Infrastructure"]
-        subgraph VPC["🏢 VPC Network"]
-            ALB[Application Load Balancer]
-            subgraph EKS["⚓ EKS Cluster"]
-                ControlPlane[Kubernetes API Server]
-                Fargate[Fargate Profiles]
-                Karpenter[Karpenter Nodes]
-                
-                Frontend[Frontend Pods]
-                Backend[Backend Pods]
-                MySQL[MySQL StatefulSet]
-                
-                Ingress[NGINX Ingress]
-                Prometheus[Prometheus]
-                Grafana[Grafana]
-                AlertMgr[Alertmanager]
-            end
-            EBS[EBS Volumes]
-        end
-    end
-
-    Code --> GHA
-    IaC --> GHA
-    GHA --> DockerReg
-    GHA --> ArgoCD
-    ArgoCD --> Frontend
-    ArgoCD --> Backend
-    ArgoCD --> MySQL
-    ArgoCD --> Ingress
-    ArgoCD --> Prometheus
-    
-    ALB --> Ingress
-    Ingress --> Frontend
-    Frontend --> Backend
-    Backend --> MySQL
-    EBS --> MySQL
-    Prometheus --> Grafana
-    Prometheus --> AlertMgr
-
-    classDef source fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef pipeline fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef infrastructure fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef application fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    classDef monitoring fill:#fff3e0,stroke:#e65100,stroke-width:2px
-
-    class Code,IaC,Helm,GitOps source
-    class GHA,DockerReg,ArgoCD pipeline
-    class ALB,EBS,ControlPlane,Fargate,Karpenter infrastructure
-    class Frontend,Backend,MySQL,Ingress application
-    class Prometheus,Grafana,AlertMgr monitoring
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                           🔧 GitHub Repository                                     │
+├─────────────────────────────────────────────────────────────────────────────────────┤
+│  📁 Source Code    📁 Terraform IaC    📁 Helm Charts    📁 GitOps Config         │
+└─────────────────────┬───────────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                        🚀 CI/CD Pipeline                                           │
+├─────────────────────────────────────────────────────────────────────────────────────┤
+│  ⚙️ GitHub Actions  ➜  🐳 Docker Registry  ➜  🎯 ArgoCD GitOps                    │
+└─────────────────────┬───────────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                      ☁️ AWS Cloud Infrastructure                                   │
+├─────────────────────────────────────────────────────────────────────────────────────┤
+│                              🏢 VPC Network                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │                        ⚓ EKS Cluster                                       │   │
+│  │                                                                             │   │
+│  │  🎛️ Control Plane        📦 Worker Nodes        💾 Storage                │   │
+│  │  ├─ Kubernetes API       ├─ Fargate Profiles     ├─ EBS CSI Driver         │   │
+│  │  └─ RBAC & Policies      └─ Karpenter Nodes      └─ Persistent Volumes     │   │
+│  │                                                                             │   │
+│  │  🌐 Applications          📊 Platform Services                             │   │
+│  │  ├─ Frontend Pods         ├─ NGINX Ingress                                 │   │
+│  │  ├─ Backend Pods          ├─ Prometheus                                    │   │
+│  │  └─ MySQL StatefulSet     ├─ Grafana                                       │   │
+│  │                           └─ Alertmanager                                  │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+│  🔗 Application Load Balancer  ➜  Ingress Controller  ➜  Application Services     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
 
 ---
 
