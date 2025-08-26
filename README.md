@@ -367,8 +367,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Cosmin** | Aspiring DevOps Engineer
 
-- 🌱 **Currently Learning**: Advanced Kubernetes patterns, Service Mesh architectures
-- 🎯 **Focus Areas**: Cloud-native technologies, Infrastructure automation, SRE practices
+- 🌱 **Currently Learning**: Advanced Kubernetes patterns, AWS Services
+- 🎯 **Focus Areas**: Cloud-native technologies, Infrastructure automation, DevOps practices
 - 🔗 **GitHub**: [@cosmin1230](https://github.com/cosmin1230)
 - 💡 **Passion**: Building scalable, automated, and observable systems
 
