@@ -92,58 +92,51 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 
 ## 🏗️ Architecture Overview
 
-```mermaid
 graph TB
-    subgraph "GitHub Repository"
+    subgraph GitHub["🔧 GitHub Repository"]
         Code[Source Code]
         IaC[Terraform Modules]
         Helm[Helm Charts]
         GitOps[GitOps Config]
     end
 
-    subgraph "CI/CD Pipeline"
+    subgraph Pipeline["🚀 CI/CD Pipeline"]
         GHA[GitHub Actions]
-        Docker[Docker Registry]
-        ArgoCD[ArgoCD]
+        DockerReg[Docker Registry]
+        ArgoCD[ArgoCD GitOps]
     end
 
-    subgraph "AWS Cloud Infrastructure"
-        subgraph "VPC"
-            subgraph "EKS Cluster"
-                subgraph "Control Plane"
-                    API[Kubernetes API]
-                end
-                
-                subgraph "Worker Nodes"
-                    Fargate[Fargate Profiles]
-                    Karpenter[Karpenter Nodes]
-                end
-                
-                subgraph "Applications"
-                    Frontend[Frontend Pods]
-                    Backend[Backend Pods]
-                    MySQL[MySQL StatefulSet]
-                end
-                
-                subgraph "Platform Services"
-                    Ingress[NGINX Ingress]
-                    Prometheus[Prometheus]
-                    Grafana[Grafana]
-                    AlertMgr[Alertmanager]
-                end
-            end
-            
+    subgraph AWS["☁️ AWS Cloud Infrastructure"]
+        subgraph VPC["🏢 VPC Network"]
             ALB[Application Load Balancer]
+            subgraph EKS["⚓ EKS Cluster"]
+                ControlPlane[Kubernetes API Server]
+                Fargate[Fargate Profiles]
+                Karpenter[Karpenter Nodes]
+                
+                Frontend[Frontend Pods]
+                Backend[Backend Pods]
+                MySQL[MySQL StatefulSet]
+                
+                Ingress[NGINX Ingress]
+                Prometheus[Prometheus]
+                Grafana[Grafana]
+                AlertMgr[Alertmanager]
+            end
             EBS[EBS Volumes]
         end
     end
 
     Code --> GHA
     IaC --> GHA
-    GHA --> Docker
+    GHA --> DockerReg
     GHA --> ArgoCD
-    ArgoCD --> Applications
-    ArgoCD --> Platform Services
+    ArgoCD --> Frontend
+    ArgoCD --> Backend
+    ArgoCD --> MySQL
+    ArgoCD --> Ingress
+    ArgoCD --> Prometheus
+    
     ALB --> Ingress
     Ingress --> Frontend
     Frontend --> Backend
@@ -152,14 +145,17 @@ graph TB
     Prometheus --> Grafana
     Prometheus --> AlertMgr
 
-    style Code fill:#e1f5fe
-    style IaC fill:#f3e5f5
-    style Helm fill:#fff3e0
-    style GitOps fill:#e8f5e8
-    style EKS fill:#fff8e1
-    style Applications fill:#fce4ec
-    style Platform Services fill:#e0f2f1
-```
+    classDef source fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef pipeline fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef infrastructure fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef application fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef monitoring fill:#fff3e0,stroke:#e65100,stroke-width:2px
+
+    class Code,IaC,Helm,GitOps source
+    class GHA,DockerReg,ArgoCD pipeline
+    class ALB,EBS,ControlPlane,Fargate,Karpenter infrastructure
+    class Frontend,Backend,MySQL,Ingress application
+    class Prometheus,Grafana,AlertMgr monitoring
 
 ---
 
