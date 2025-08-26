@@ -20,7 +20,7 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 - **Production-Ready Architecture**: Scalable, secure, and observable
 - **GitOps Methodology**: Declarative, version-controlled deployments
 - **Enterprise Monitoring**: Full observability stack with alerting
-- **Security First**: IAM, and cloud security best practices
+- **Security First**: IAM, RBAC, and cloud security best practices
 
 ---
 
@@ -46,6 +46,7 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 
 ### 🔐 **Security & Networking**
 - **Network Security**: Custom VPC with private/public subnet architecture
+- **Access Control**: RBAC implementation for granular permissions
 - **Load Balancing**: NGINX Ingress Controller for intelligent traffic routing
 - **Storage Security**: Encrypted EBS volumes with CSI driver integration
 
@@ -93,56 +94,71 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 ## 🏗️ Architecture Overview
 
 ```mermaid
-graph LR
-    %% Define Styles
-    classDef source fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef pipeline fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
-    classDef aws fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px;
-    classDef gitops fill:#fffde7,stroke:#f57f17,stroke-width:2px;
-    classDef appstack fill:#fce4ec,stroke:#880e4f,stroke-width:2px;
-    classDef monitoring fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-
-    subgraph "Source of Truth"
-        Repo["GitHub Repo"]
+graph TB
+    subgraph GitHub["🔧 GitHub Repository"]
+        Code[Source Code]
+        IaC[Terraform Modules]
+        Helm[Helm Charts]
+        GitOps[GitOps Config]
     end
 
-    subgraph "CI Automation"
-        GHA["GitHub Actions"]
-        Docker["Docker Registry"]
-        GHA -- Build & Push --> Docker;
-        GHA -- Updates image tag in --> Repo;
+    subgraph Pipeline["🚀 CI/CD Pipeline"]
+        GHA[GitHub Actions]
+        DockerReg[Docker Registry]
+        ArgoCD[ArgoCD GitOps]
     end
 
-    subgraph "AWS Cloud Environment"
-        ALB[Application LB]
-        subgraph "EKS Cluster"
-            direction TB
-            subgraph "GitOps Controller"
-                ArgoCD
+    subgraph AWS["☁️ AWS Cloud Infrastructure"]
+        subgraph VPC["🏢 VPC Network"]
+            ALB[Application Load Balancer]
+            subgraph EKS["⚓ EKS Cluster"]
+                ControlPlane[Kubernetes API Server]
+                Fargate[Fargate Profiles]
+                Karpenter[Karpenter Nodes]
+                
+                Frontend[Frontend Pods]
+                Backend[Backend Pods]
+                MySQL[MySQL StatefulSet]
+                
+                Ingress[NGINX Ingress]
+                Prometheus[Prometheus]
+                Grafana[Grafana]
+                AlertMgr[Alertmanager]
             end
-            subgraph "Application Stack"
-                Ingress[NGINX Ingress] --> App[Python Flask Pods]
-            end
-            subgraph "Observability Stack"
-                Prom[Prometheus] --> Graf[Grafana] & Alert[Alertmanager]
-            end
+            EBS[EBS Volumes]
         end
     end
 
-    %% Define Connections
-    Repo -- Triggers --> GHA;
-    ArgoCD -- Pulls Desired State From --> Repo;
-    ArgoCD -- Deploys & Manages --> Ingress & App & Prom & Graf;
-    ALB -- Forwards Traffic To --> Ingress;
-    Prom -- Scrapes Metrics From --> App & Ingress;
+    Code --> GHA
+    IaC --> GHA
+    GHA --> DockerReg
+    GHA --> ArgoCD
+    ArgoCD --> Frontend
+    ArgoCD --> Backend
+    ArgoCD --> MySQL
+    ArgoCD --> Ingress
+    ArgoCD --> Prometheus
+    
+    ALB --> Ingress
+    Ingress --> Frontend
+    Frontend --> Backend
+    Backend --> MySQL
+    EBS --> MySQL
+    Prometheus --> Grafana
+    Prometheus --> AlertMgr
 
-    %% Apply Styles
-    class Repo source;
-    class GHA,Docker pipeline;
-    class ALB aws;
-    class ArgoCD gitops;
-    class Ingress,App appstack;
-    class Prom,Graf,Alert monitoring;
+    classDef source fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef pipeline fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef infrastructure fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef application fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef monitoring fill:#fff3e0,stroke:#e65100,stroke-width:2px
+
+    class Code,IaC,Helm,GitOps source
+    class GHA,DockerReg,ArgoCD pipeline
+    class ALB,EBS,ControlPlane,Fargate,Karpenter infrastructure
+    class Frontend,Backend,MySQL,Ingress application
+    class Prometheus,Grafana,AlertMgr monitoring
+```
 
 ---
 
@@ -289,7 +305,7 @@ Ensure you have the following tools installed:
 - ✅ Pod scheduling and resource management
 - ✅ StatefulSets for persistent workloads
 - ✅ ConfigMaps and Secrets management
-- ✅ Security policies
+- ✅ RBAC and security policies
 - ✅ Ingress controllers and networking
 
 </td>
@@ -351,14 +367,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Cosmin** | Aspiring DevOps Engineer
 
-- 🌱 **Currently Learning**: Advanced Kubernetes patterns, AWS Services
-- 🎯 **Focus Areas**: Cloud-native technologies, Infrastructure automation, DevOps practices
+- 🌱 **Currently Learning**: Advanced Kubernetes patterns, Service Mesh architectures
+- 🎯 **Focus Areas**: Cloud-native technologies, Infrastructure automation, SRE practices
 - 🔗 **GitHub**: [@cosmin1230](https://github.com/cosmin1230)
 - 💡 **Passion**: Building scalable, automated, and observable systems
 
 ---
 
 <div align="center">
+
+**⭐ If you found this project helpful, please consider giving it a star!**
 
 *This project showcases practical DevOps skills through real-world implementation of industry-standard tools and practices.*
 
