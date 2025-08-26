@@ -102,70 +102,46 @@ graph LR
     classDef appstack fill:#fce4ec,stroke:#880e4f,stroke-width:2px;
     classDef monitoring fill:#fff3e0,stroke:#e65100,stroke-width:2px;
 
-    %% STAGE 1: Source of Truth
-    subgraph " "
-        subgraph "Source of Truth"
-            direction LR
-            Repo[("fa:fa-git-alt GitHub Repo")]
-        end
+    subgraph "Source of Truth"
+        Repo["GitHub Repo"]
     end
 
-    %% STAGE 2: CI Automation Pipeline
-    subgraph " "
-      subgraph "CI Automation (External)"
-          direction TB
-          GHA[GitHub Actions] --> Docker[("fa:fa-docker Docker Registry")];
-          GHA -->|Updates image tag| Repo;
-      end
+    subgraph "CI Automation"
+        GHA["GitHub Actions"]
+        Docker["Docker Registry"]
+        GHA -- Build & Push --> Docker;
+        GHA -- Updates image tag in --> Repo;
     end
 
-    %% STAGE 3: AWS Live Environment
     subgraph "AWS Cloud Environment"
-        direction TB
-        ALB[Application Load Balancer]
-
-        subgraph "Kubernetes Cluster (EKS)"
+        ALB[Application LB]
+        subgraph "EKS Cluster"
             direction TB
-            
             subgraph "GitOps Controller"
-                ArgoCD[ArgoCD]
+                ArgoCD
             end
-
             subgraph "Application Stack"
-                direction TB
-                Ingress[NGINX Ingress] --> Frontend[Frontend Pods];
-                Frontend --> Backend[Backend Pods];
-                Backend --> DB[("fa:fa-database MySQL<br/>StatefulSet")];
+                Ingress[NGINX Ingress] --> App[Python Flask Pods]
             end
-            
             subgraph "Observability Stack"
-                direction TB
-                Prom[Prometheus] --> Graf[Grafana];
-                Prom --> Alert[Alertmanager];
-            end
-
-            subgraph "Cluster Autoscaling"
-                Karpenter[Karpenter]
+                Prom[Prometheus] --> Graf[Grafana] & Alert[Alertmanager]
             end
         end
-        EBS[("EBS Volume<br/>Persistent Storage")]
     end
 
     %% Define Connections
     Repo -- Triggers --> GHA;
-    ArgoCD -- Pulls Config From --> Repo;
-    ArgoCD -- Deploys / Manages --> Ingress & Frontend & Backend & DB & Prom & Graf;
-    
-    ALB -- User Traffic --> Ingress;
-    DB -- Stores Data On --> EBS;
-    Prom -- Scrapes Metrics From --> Frontend & Backend & Ingress;
+    ArgoCD -- Pulls Desired State From --> Repo;
+    ArgoCD -- Deploys & Manages --> Ingress & App & Prom & Graf;
+    ALB -- Forwards Traffic To --> Ingress;
+    Prom -- Scrapes Metrics From --> App & Ingress;
 
     %% Apply Styles
     class Repo source;
     class GHA,Docker pipeline;
-    class ALB,EBS,Karpenter aws;
+    class ALB aws;
     class ArgoCD gitops;
-    class Ingress,Frontend,Backend,DB appstack;
+    class Ingress,App appstack;
     class Prom,Graf,Alert monitoring;
 
 ---
