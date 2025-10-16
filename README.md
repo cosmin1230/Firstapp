@@ -93,7 +93,7 @@ This full-stack PC parts ordering platform represents my journey from DevOps beg
 
 ## 🏗️ Architecture Overview
 
-(https://github.com/user-attachments/assets/e88065cf-211f-4e1b-a4c8-f35cb5f61fe4)
+![Arhitecture Diagram](https://github.com/user-attachments/assets/e88065cf-211f-4e1b-a4c8-f35cb5f61fe4)
 
 ---
 
